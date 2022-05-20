@@ -1,6 +1,0 @@
-Instructions
-1) roslaunch multiple_robots multi_burgersCorridor.launch
-2) rviz -d /home/jharbin/catkin_ws/src/multiple_robots/rviz/turtlebot3_navigationDos.rviz
-3)ROS_NAMESPACE=tb3_0 roslaunch navigation_with_objective coordinates.launch ; before running this remember to initiate the java intermediate class
-4)ROS_NAMESPACE=tb3_0 roslaunch navigation_with_objective StartGoalMonitor.launch
-
