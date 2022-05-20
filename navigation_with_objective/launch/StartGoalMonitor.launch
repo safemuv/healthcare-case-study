@@ -1,0 +1,4 @@
+<launch>
+ <node name="goal_monitor" pkg="navigation_with_objective" type="goalMonitor.py" output="screen">
+     </node>
+</launch>

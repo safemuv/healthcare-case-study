@@ -1,0 +1,14 @@
+#the only modification in this file is to add robt's namespace/base_scan e.g.tb3_0/base_scan
+#this file is the exmaple of the original navigation(oneRobot at the time); currently has not been used.
+obstacle_range: 3.0
+raytrace_range: 3.5
+
+footprint: [[-0.105, -0.105], [-0.105, 0.105], [0.041, 0.105], [0.041, -0.105]]
+#robot_radius: 0.105
+
+inflation_radius: 1.75 #1.0
+cost_scaling_factor: 2.58 #3.0
+
+map_type: costmap
+observation_sources: scan
+scan: {sensor_frame: base_scan, data_type: LaserScan, topic: scan, marking: true, clearing: true}

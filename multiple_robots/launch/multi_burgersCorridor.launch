@@ -1,0 +1,134 @@
+<!-- multi_burgers Corridor -->
+<launch>
+  <param name="/use_sim_time" value="true"/>
+  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="map_file"       default="/home/osboxes/catkin_ws/src/maps/mapWhiteCorridorV2.yaml"/>
+  <arg name="open_rviz" default="true"/>
+  <arg name="first_tb3"  default="tb3_0"/>
+  <arg name="second_tb3" default="tb3_1"/>
+  <arg name="third_tb3" default="tb3_2"/>
+  
+
+  <arg name="first_tb3_x_pos" default="3.46"/>
+  <arg name="first_tb3_y_pos" default="-3.60"/>
+  <arg name="first_tb3_yaw"   default="2.0"/>
+
+  <arg name="second_tb3_x_pos" default="3.45"/>
+  <arg name="second_tb3_y_pos" default="-3.24"/>
+  <arg name="second_tb3_yaw"   default="0.0"/>
+
+  <arg name="third_tb3_x_pos" default="-5.59"/>
+  <arg name="third_tb3_y_pos" default="-3.23"/>
+  <arg name="third_tb3_yaw"   default="0.0"/>
+
+ 
+<!-- running the world for gazebo /home/osboxes/catkin_ws/src/myWorlds/test.world -->
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="/home/osboxes/catkin_ws/src/myWorlds/whiteCorridorV2.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+<!-- load the map server-->
+  <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)">
+	<param name="frame_id" value="map"/>
+  </node>
+<!-- first robot -->
+  <group ns = "$(arg first_tb3)">
+
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="$(arg first_tb3)" />
+    </node>
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg first_tb3) -x $(arg first_tb3_x_pos) -y $(arg first_tb3_y_pos) -Y $(arg first_tb3_yaw) -param robot_description" />
+    
+    <!--amcl -->
+    <include file="$(find multiple_robots)/launch/amcl_modified.launch">
+      <arg name="initial_pose_x" value="$(arg first_tb3_x_pos)" />
+      <arg name="initial_pose_y" value="$(arg first_tb3_y_pos)" />
+      <arg name="initial_pose_a" value="$(arg first_tb3_yaw)" />
+      <arg name="set_base_frame" value="$(arg first_tb3)/base_footprint" />
+      <arg name="set_odom_frame" value="$(arg first_tb3)/odom" />
+    </include>
+    <!--move_base-->
+    <include file="$(find multiple_robots)/launch/move_base_ulti.launch">
+      <arg name="set_local_costmap_params"  value="local_costmap_params_tb3_0.yaml" />
+      <arg name="set_global_costmap_params" value="global_costmap_params_tb3_0.yaml" />
+      <arg name="set_costmap_common"        value="costmap_common_params_burger_tb3_0.yaml" />
+      
+    </include>    
+  </group>
+
+<!-- second robot -->
+  <group ns = "$(arg second_tb3)">
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="$(arg second_tb3)" />
+    </node>
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg second_tb3) -x $(arg second_tb3_x_pos) -y $(arg second_tb3_y_pos) -Y $(arg second_tb3_yaw) -param robot_description" />
+
+<!--amcl -->
+    <include file="$(find multiple_robots)/launch/amcl_modified.launch">
+      <arg name="initial_pose_x" value="$(arg second_tb3_x_pos)" />
+      <arg name="initial_pose_y" value="$(arg second_tb3_y_pos)" />
+      <arg name="initial_pose_a" value="$(arg second_tb3_yaw)" />
+      <arg name="set_base_frame" value="$(arg second_tb3)/base_footprint" />
+      <arg name="set_odom_frame" value="$(arg second_tb3)/odom" />
+    </include>
+    <!--move_base-->
+    <include file="$(find multiple_robots)/launch/move_base_ulti.launch">
+      <arg name="set_local_costmap_params"  value="local_costmap_params_tb3_1.yaml" />
+      <arg name="set_global_costmap_params" value="global_costmap_params_tb3_1.yaml" />
+      <arg name="set_costmap_common"        value="costmap_common_params_burger_tb3_1.yaml" />
+    </include>
+    
+  </group>
+
+   <!-- third robot -->
+  <group ns = "$(arg third_tb3)">
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="$(arg third_tb3)" />
+    </node>
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg third_tb3) -x $(arg third_tb3_x_pos) -y $(arg third_tb3_y_pos) -Y $(arg third_tb3_yaw) -param robot_description" />
+
+<!--amcl -->
+    <include file="$(find multiple_robots)/launch/amcl_modified.launch">
+      <arg name="initial_pose_x" value="$(arg third_tb3_x_pos)" />
+      <arg name="initial_pose_y" value="$(arg third_tb3_y_pos)" />
+      <arg name="initial_pose_a" value="$(arg third_tb3_yaw)" />
+      <arg name="set_base_frame" value="$(arg third_tb3)/base_footprint" />
+      <arg name="set_odom_frame" value="$(arg third_tb3)/odom" />
+    </include>
+    <!--move_base-->
+    <include file="$(find multiple_robots)/launch/move_base_ulti.launch">
+      <arg name="set_local_costmap_params"  value="local_costmap_params_tb3_2.yaml" />
+      <arg name="set_global_costmap_params" value="global_costmap_params_tb3_2.yaml" />
+      <arg name="set_costmap_common"        value="costmap_common_params_burger_tb3_2.yaml" />
+    </include>
+    
+  </group>
+
+
+
+
+
+
+
+ <!--  **************** Visualisation ****************
+  <group if="$(arg open_rviz)"> 
+    <node pkg="rviz" type="rviz" name="rviz" required="true"
+          args="-d $(find multiple_robots)/rviz/turtlebot3_navigationDos.rviz"/>
+  </group>-->  
+
+</launch>

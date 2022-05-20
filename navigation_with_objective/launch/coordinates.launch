@@ -1,0 +1,4 @@
+<launch>
+ <node name="map_navigation_python" pkg="navigation_with_objective" type="map_navigation_corridor_white.py" output="screen">
+     </node>
+</launch>
